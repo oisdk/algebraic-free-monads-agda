@@ -24,14 +24,6 @@ open import FreeMonad.Quotiented 𝒯
 [_/⟨⟩] : Term A → Term ⊤
 [_/⟨⟩] = _>> return ⟨⟩
 
-module DisplayConditions where
-  module _ {A : Type a} where
-    SEF : Term A → Type _
-    DET : Term A → Type _
-    SEF  p = (do p; return ⟨⟩) ≡ return ⟨⟩
-    DET  p = (do x ← p; y ← p; return (x , y)) ≡ (do x ← p; p; return (x , x))
-
-
 module _ (p : Level) where
   module _ {A : Type a} where
     SEF : Term A → Type _
@@ -47,47 +39,8 @@ module _ (p : Level) where
   Assertion : Type (ℓ ℓ⊔ ℓsuc (ℓsuc p))
   Assertion = Σ[ ϕ ⦂ Term Ω ] × SEF (ℓsuc p) ϕ × DET (ℓsuc p) ϕ
 
-module _ {p : Level} where
-  open import Truth.Combinators {ℓ = p }
-  open import Truth.Definition p
-  open import Truth.Logic
-
-  module DisplayGlobal {a} {A : Type a} where
-    open import Truth.Definition (ℓ ℓ⊔ ℓsuc p ℓ⊔ a) using () renaming (Ω to Ω₁)
-
-    open import Truth using () renaming (Ω to Ω′)
-
-    𝒢 : Term (A × Ω) → Type _
-    𝒢 p = p ≡ (do x , _ ← p; return (x , True))
-    𝒢-Ω : Term (A × Ω) → Ω₁
-    ProofOf  (𝒢-Ω t) = 𝒢 t
-    IsProp   (𝒢-Ω t) = squash/ _ _
-
-    Hoare : Term Ω → Term A → (A → Term Ω) → Type _
-    Hoare ϕ p ψ = 𝒢 do a ← ϕ; x ← p; b ← ψ x; return (x , a |→| b)
-    hoare-def-explicit : Term Ω → Term A → (A → Term Ω) → Type _
-    hoare-def-explicit = λ ϕ p ψ →
-         (do a ← ϕ; x ← p; b ← ψ x; return (x , a |→| b))
-      ≡  (do a ← ϕ; x ← p; b ← ψ x; return (x , True))
-    _ : Term Ω → Term A → (A → Term Ω) → Type _
-    _ = λ ϕ p ψ →
-         (do a ← ϕ; x ← p; b ← ψ x; return (x , a |→| b))
-      ≡  (do a ← ϕ; x ← p; b ← ψ x; return (x , True))
-    HoareNoAssume : Term A → (A → Term Ω) → Type _
-    HoareNoAssume t ψ = Hoare (return True) t ψ
-
-    syntax Hoare ϕ p (λ x → ψ) = ⟅ ϕ ⟆ x ← p ⟅ ψ ⟆
-
-    syntax HoareNoAssume p (λ x → ψ) = ⟅⟆ x ← p ⟅ ψ ⟆
-
-  open DisplayGlobal using (hoare-def-explicit) public
-
 -- We need to keep the variables in the expression. This is a difference from
 -- HasCasl.
-
--- However, we won't use this much type elsewhere, since we often also need the
--- variables in the expression as well.
--- Instead, we'll specialise it to each use case, like the following:
 
 open import Truth
 

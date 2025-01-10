@@ -17,9 +17,6 @@ open import FreeMonad.HElim 𝒯 findVar fin-arities
 open import FreeMonad.Quotiented 𝒯
 
 module _ {p : Level} where
-  -- open import Truth.MonoLevel p
-  -- open DisplayGlobal {p}
-
   -- This is just 𝒢-elim repackaged for Hoare logic
   module _ {A B : Type}
            (ϕ : A → Ω p)
