@@ -56,9 +56,6 @@ infix 5.5 _|≡|_
 _|≡|_ : A → A → Ω _
 x |≡| y = Ω∣ x ≡ y ∣
 
-|T| : Bool → Ω a
-|T| = bool′ False True
-
 |→|-trans : (x y z : Ω a) → ((x |→| y) |∧| (y |→| z)) |→| (x |→| z) ≡ True
 |→|-trans x y z = const Poly-tt iff const (uncurry (flip _∘_))
 

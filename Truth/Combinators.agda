@@ -21,6 +21,9 @@ False : Ω
 ProofOf False = ⊥
 IsProp  False ()
 
+|T| : Bool → Ω
+|T| = bool′ False True
+
 open import Cubical.Foundations.HLevels using (isPropIsOfHLevel)
 
 cong-∥ : (x y : Ω) → (lhs : ProofOf x ≡ ProofOf y) → PathP (λ i → isProp (lhs i)) (IsProp x) (IsProp y) → x ≡ y
