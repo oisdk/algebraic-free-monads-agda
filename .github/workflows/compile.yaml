@@ -1,0 +1,58 @@
+name: Compile Agda and Deploy
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.markdown'
+
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  compile-agda:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    name: Compile Agda
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        cubical-ref: ["v0.7"]
+        agda-ver: ["2.6.4.3"]
+
+    steps:
+
+    - uses: wenkokke/setup-agda@v2.5.0
+      with:
+        agda-version: ${{ matrix.agda-ver }}
+        agda-libraries: |
+          https://github.com/agda/cubical.git#${{ matrix.cubical-ref }}
+
+    - name: Checkout main
+      uses: actions/checkout@v4.1.1
+
+    - name: Compile agda library
+      run: ./scripts/render.sh
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: 'docs'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
